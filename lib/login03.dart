@@ -11,10 +11,26 @@ void main() {
   runApp(MyApp());
 }
 
-class Login03 extends StatelessWidget {
-  final now = DateTime.now();
+class Login03 extends StatefulWidget {
+  @override
+  _Login03State createState() => _Login03State();
+}
+
+class _Login03State extends State<Login03> {
+  var siteIdController = TextEditingController();
+  var sitePwController = TextEditingController();
+
+  @override
+  void dispose() {
+    siteIdController.dispose();
+    sitePwController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+
     return Scaffold(
         appBar: const CustomAppBar(),
         body: Center(
@@ -27,9 +43,11 @@ class Login03 extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Text("국민안전신문고로 로그인하기\n최초 로그인 시 1회만 수행해요", textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF888888),),),
                 const SizedBox(height: 20),
-                InputCustomTextField(hintText: '아이디'),
+                InputCustomTextField(hintText: '아이디',
+                  controller: siteIdController,),
                 const SizedBox(height: 8),
-                InputCustomTextField(hintText: '비밀번호'),
+                InputCustomTextField(hintText: '비밀번호',
+                  controller: sitePwController,),
                 const SizedBox(height: 20),
                 const Row(
                   children: [
