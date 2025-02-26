@@ -3,7 +3,7 @@ import 'package:flyaid5pamine/widgets/BottomNavi.dart';
 import 'package:flyaid5pamine/widgets/CustomAppBar.dart';
 import 'package:flyaid5pamine/widgets/CustomButton.dart';
 
-import 'login01.dart';
+import 'main.dart';
 
 void main() {
   runApp(MyApp());

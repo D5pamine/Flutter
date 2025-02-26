@@ -46,6 +46,7 @@ dependencies:
   loading_animation_widget:
   table_calendar:
   flutter_dotenv:
+  flutter_secure_storage:
 
 
 dev_dependencies:

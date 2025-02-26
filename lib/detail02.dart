@@ -4,7 +4,7 @@ import 'package:flyaid5pamine/widgets/CustomButton.dart';
 import 'package:flyaid5pamine/widgets/CustomIconText.dart';
 import 'package:video_player/video_player.dart';
 
-import 'login01.dart';
+import 'main.dart';
 
 void main() {
   runApp(MyApp());

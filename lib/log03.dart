@@ -5,7 +5,7 @@ import 'package:flyaid5pamine/widgets/CustomAppBar.dart';
 import 'package:flyaid5pamine/widgets/MovieCard.dart';
 import 'package:video_player/video_player.dart';
 
-import 'login01.dart';
+import 'main.dart';
 
 void main() {
   runApp(MyApp());
