@@ -20,24 +20,33 @@ class UserDataGet {
     print("Loaded SERVER_URL: ${dotenv.get("SERVER_URL", fallback: "NOT_FOUND")}");
     print("Using Token: $token"); // ✅ 디버깅을 위해 토큰 출력 (실제 앱에서는 로그 숨길 것)
 
-    final response = await http.get(
-      Uri.parse('${dotenv.get("SERVER_URL")}/user/user/info'),
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token", // ✅ 토큰 추가
-      },
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('${dotenv.get("SERVER_URL")}/user/user/info'),
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token", // ✅ 토큰 추가
+        },
+      );
 
-    if (response.statusCode == 200) {
-      var res = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final decodedBody = utf8.decode(response.bodyBytes); // ✅ UTF-8 디코딩 적용
+        var res = jsonDecode(decodedBody); // ✅ JSON 변환
+        return {
+          "statusCode": response.statusCode,
+          "data": res,
+        };
+      } else {
+        final errorMessage = utf8.decode(response.bodyBytes); // ✅ UTF-8 디코딩 적용
+        return {
+          "statusCode": response.statusCode,
+          "error": "❌ Failed to fetch user info: $errorMessage",
+        };
+      }
+    } catch (e) {
       return {
-        "statusCode": response.statusCode,
-        "data": res,
-      };
-    } else {
-      return {
-        "statusCode": response.statusCode,
-        "error": "❌ Failed to fetch user info: ${response.body}",
+        "statusCode": 500,
+        "error": "❌ 요청 중 예외 발생: ${e.toString()}",
       };
     }
   }

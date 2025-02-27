@@ -50,11 +50,16 @@ class _Login02State extends State<Login02> {
     var date = DateFormat('yyyy-MM-dd (E)', 'ko').format(now);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: const CustomAppBar(),
-      body: Center(
-        child: Padding(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Center(
+          child: SingleChildScrollView(
+            // keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Padding(
           padding: const EdgeInsets.only(
-            left: 20.0,
+          left: 20.0,
             top: 40.0,
             right: 20.0,
             bottom: 20.0,
@@ -62,6 +67,19 @@ class _Login02State extends State<Login02> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                // padding: const EdgeInsets.only(left: 20.0),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login01()),
+                    );
+                  },
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB267)),
+                ),
+              ),
               Container(
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.only(left: 20.0),
@@ -141,7 +159,7 @@ class _Login02State extends State<Login02> {
                     );
 
                     // 회원가입 성공 시 처리
-                    if (res["message"] == "회원가입 성공!") {
+                    if (res['statusCode'] == 200) {
                       print("회원가입 성공: $res");
                       showDialog(
                         context: context,
@@ -195,6 +213,8 @@ class _Login02State extends State<Login02> {
               ),
               const SizedBox(height: 50),
             ],
+          ),
+        ),
           ),
         ),
       ),

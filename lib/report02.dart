@@ -21,7 +21,7 @@ class Report02 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(
-              height: 530,
+              height: 520,
               width: 315,
               child: Center(
                 child:

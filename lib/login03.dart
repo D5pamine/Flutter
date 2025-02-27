@@ -32,6 +32,7 @@ class _Login03State extends State<Login03> {
     final now = DateTime.now();
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: const CustomAppBar(),
         body: Center(
           child: Padding(

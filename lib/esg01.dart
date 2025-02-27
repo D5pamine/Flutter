@@ -6,6 +6,8 @@ import 'package:flyaid5pamine/widgets/CustomCard.dart';
 import 'package:flyaid5pamine/widgets/CustomColorBox.dart';
 import 'package:flyaid5pamine/widgets/WeeklyBarchart.dart';
 
+import 'home01.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -25,7 +27,12 @@ class Esg01 extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 0.0),
-                  child: IconButton(onPressed: () {}, icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB267)),),
+                  child: IconButton(onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Home01()),
+                    );
+                   }, icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB267)),),
                 ),
               ),
               CustomCard(
@@ -93,7 +100,7 @@ class Esg01 extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 5,),
                       Center(
                           child:
                             Row(
@@ -107,23 +114,23 @@ class Esg01 extends StatelessWidget {
                               ],
                             ),
                         ),
-                      const SizedBox(height: 18,),
+                      const SizedBox(height: 6,),
                       const Row(
                         children: [
                           CustomColorBox(boxWidth: 12, boxHeight: 12, boxColor: Color(0xffFFB267),),
-                          const SizedBox(width: 8,),
+                          const SizedBox(width: 4,),
                           Text('200.0 의 탄소 절감 효과', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400),),
                           const Spacer(),
                           Text('- 100', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xffFFB267)),)
                         ],
                       ),
-                      const SizedBox(height: 8,),
+                      const SizedBox(height: 4,),
                       Container(width: 500, height: 1, color: const Color(0xFFE9EEF8)),
-                      const SizedBox(height: 8,),
+                      const SizedBox(height: 4,),
                       const Row(
                         children: [
                           CustomColorBox(boxWidth: 12, boxHeight: 12, boxColor: Color(0xff219653),),
-                          const SizedBox(width: 8,),
+                          const SizedBox(width: 4,),
                           Text('나무 3 그루를 살렸어요', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400),),
                           const Spacer(),
                           Text('- 300', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xff219653)),)

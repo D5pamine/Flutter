@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flyaid5pamine/log01.dart';
 
 import '../home01.dart';
 import '../log02.dart';
@@ -13,7 +14,7 @@ class BottomNavi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 30,
+      height: 20,
       child: DecoratedBox(
         decoration: const BoxDecoration(
           // color: Colors.white,
@@ -32,17 +33,17 @@ class BottomNavi extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => Home01()),
                 );
               },
-              child: Image.asset('assets/images/free-icon-home.png', height: 35,
+              child: Image.asset('assets/images/free-icon-home.png', height: 25,
               color: const Color(0xFF2F2F2F),),
             ),
             InkWell(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Log02()),
+                  MaterialPageRoute(builder: (context) => Log01()),
                 );
               },
-              child: Image.asset('assets/images/free-icon-clock.png', height: 40,
+              child: Image.asset('assets/images/free-icon-clock.png', height: 23,
                 color: const Color(0xFF2F2F2F),),
             ),
             InkWell(
@@ -52,7 +53,7 @@ class BottomNavi extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => Search01()),
                 );
               },
-              child: Image.asset('assets/images/free-icon-magnifying.png', height: 35,
+              child: Image.asset('assets/images/free-icon-magnifier.png', height: 35,
                 color: const Color(0xFF2F2F2F),),
             ),
              InkWell(
@@ -62,7 +63,7 @@ class BottomNavi extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => MyPage01()),
                 );
               },
-              child: Image.asset('assets/images/free-icon-user.png', height: 30,
+              child: Image.asset('assets/images/free-icon-user.png', height: 25,
                 color: const Color(0xFF2F2F2F),),
              ),
           ],

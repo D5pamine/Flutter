@@ -22,7 +22,7 @@ class _Report01State extends State<Report01> {
   void initState() {
     super.initState();
     // 5초 후 Login01 화면으로 전환
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Report02()),

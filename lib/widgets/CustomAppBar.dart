@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String titleText;
 
-  const CustomAppBar({Key? key, this.titleText='픽카추'}) : super(key: key);
+  const CustomAppBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,15 +11,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     var date = DateFormat('yyyy-MM-dd (E)', 'ko').format(now);
 
     return AppBar(
+      automaticallyImplyLeading: false, // ✅ 기본 뒤로가기 버튼 제거
+      titleSpacing: 20, // ✅ 제목을 완전히 왼쪽에 붙이기
       title: Padding(
-        padding: const EdgeInsets.only(left: 20.0, top: 40.0, right: 20.0, bottom: 20.0),
+        padding: const EdgeInsets.only(left: 00.0, top: 00.0, right: 00.0, bottom: 00.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              titleText,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 28),
-            ),
+            Image.asset('assets/images/Pchew_logo.png', height: 50,),
             Text(
               date,
               style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 15),

@@ -13,11 +13,15 @@ void main() {
 }
 
 class Detail01 extends StatefulWidget {
+  final int detectedId;
+
+  const Detail01({Key? key, required this.detectedId}) : super(key: key);
+
   @override
-  _Detail01 createState() => _Detail01();
+  _Detail01State createState() => _Detail01State();
 }
 
-class _Detail01 extends State<Detail01> {
+class _Detail01State extends State<Detail01> {
   List<VideoPlayerController> controllers = [];
   final now = DateTime.now();
 

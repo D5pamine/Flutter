@@ -73,9 +73,10 @@ flutter:
     - assets/images/free-icon-leaf.png
     - assets/images/free-icon-tree.png
     - assets/images/free-icon-home.png
-    - assets/images/free-icon-magnifying.png
+    - assets/images/free-icon-magnifier.png
     - assets/images/free-icon-clock.png
     - assets/images/free-icon-user.png
+    - assets/images/Pchew_logo.png
     - .env
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

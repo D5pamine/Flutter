@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flyaid5pamine/esg01.dart';
-import 'package:flyaid5pamine/log01.dart';
 import 'package:flyaid5pamine/service/userdataget.dart';
 import 'package:flyaid5pamine/service/videoget.dart';
 import 'package:flyaid5pamine/widgets/BottomNavi.dart';
@@ -10,7 +9,6 @@ import 'package:flyaid5pamine/main.dart';
 import 'package:flyaid5pamine/widgets/CustomAppBar.dart';
 import 'package:video_player/video_player.dart';
 
-import 'home01_test.dart';
 import 'log02.dart';
 
 void main() {
@@ -23,7 +21,6 @@ class Home01 extends StatefulWidget {
 }
 
 class _Home01State extends State<Home01> {
-  VideoPlayerController? _controller; // nullable로 선언
   List<Map<String, dynamic>> videoList = []; // FastAPI에서 가져온 영상 데이터 리스트
   List<int> detectedIdList = [];
   final now = DateTime.now(); // 현재 날짜 저장
@@ -73,7 +70,7 @@ class _Home01State extends State<Home01> {
   Future<void> fetchVideos() async {
     if (userId == "Loading..." || userId.isEmpty) {
       print("⏳ userId를 가져오는 중... 영상 요청을 보류합니다.");
-      return; // userId가 아직 준비되지 않았다면 실행하지 않음
+      return;
     } else {
       print("영상 요청을 실행합니다 멘탈 잡으세요");
     }
@@ -86,52 +83,37 @@ class _Home01State extends State<Home01> {
     if (response["statusCode"] == 200) {
       print("📹 영상 리스트: ${response["data"]}");
       setState(() {
-        videoList = List<Map<String, dynamic>>.from(response["data"]); // 리스트 저장
+        videoList = List<Map<String, dynamic>>.from(response["data"]);
         detectedIdList = videoList
             .map((video) => video["detected_id"] as int)
             .toList();
         print("✅ 영상 번호 가져오기: $detectedIdList");
       });
       await fetchAndLoadVideos();
-      if (videoPaths.isNotEmpty) {
-        initializeVideoPlayer();
-      }
     } else {
       print(response["error"]);
     }
   }
 
   Future<void> fetchAndLoadVideos() async {
-    for (var detectedId in detectedIdList) { // 리스트 순회
-      String? videoUrl = await VideoStream().streamUserVideo(detectedId); // 개별 ID로 API 요청
-
+    for (var detectedId in detectedIdList) {
+      // 개별 ID로 API 요청하여 비디오 URL 가져오기
+      String? videoUrl = await VideoStream().streamUserVideo(detectedId);
       print("🔍 요청한 detectedId: $detectedId");
-      print("📥 가져온 비디오 URL: ${videoUrl ?? '❌ URL 없음'}");
-
-      if (videoUrl == null || videoUrl.isEmpty) { // URL이 없을 경우 오류 출력
+      print("📥 가져온 비디오 URL: ${videoUrl}");
+      if (videoUrl == null || videoUrl.isEmpty) {
         print("❌ 유효하지 않은 비디오 URL입니다. detectedId: $detectedId");
       } else {
         videoPaths.add(videoUrl);
         print("🔍 현재 비디오 경로 현황: $videoPaths");
       }
     }
-    videoPaths.add('http://192.168.35.8:8000/video-stream/11');
-    print("🔍 현재 비디오 경로 현황: $videoPaths");
-  }
-
-  void initializeVideoPlayer() {
-    // videoPaths의 첫 번째 URL로 _controller 초기화
-    _controller = VideoPlayerController.network(videoPaths[0])
-      ..initialize().then((_) {
-        setState(() {
-          // 초기화 후 UI 갱신
-        });
-      });
+    setState(() {}); // 영상 경로 로딩 완료 후 UI 업데이트
   }
 
   @override
   void dispose() {
-    _controller?.dispose();  // _controller가 null이 아닐 때만 dispose
+    // 각 VideoItemWidget이 개별적으로 controller를 dispose하므로 여기서는 별도 처리 X
     super.dispose();
   }
 
@@ -145,6 +127,7 @@ class _Home01State extends State<Home01> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 상단 인사 및 사용자 정보 영역
             Row(
               children: [
                 const Column(
@@ -179,7 +162,7 @@ class _Home01State extends State<Home01> {
                 TextButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Log01()));
+                        MaterialPageRoute(builder: (context) => Log02()));
                   },
                   child: const Text('더보기 >',
                       style: TextStyle(
@@ -212,29 +195,34 @@ class _Home01State extends State<Home01> {
               ],
             ),
             const SizedBox(height: 4),
-            /// 비디오가 로드된 후에만 화면에 표시
-            Center(
-              child: _controller != null && _controller!.value.isInitialized
-                  ? Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20), // 둥근 모서리 적용
-                  child: SizedBox(
-                    height: 160, // 비디오 컨테이너 높이 지정
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal, // 가로 스크롤 가능
-                      itemCount: videoPaths.length, // 리스트에 있는 모든 영상
-                      itemBuilder: (context, index) {
-                        return VideoItemWidget(videoUrl: videoPaths[index]);
-                      },
+            // videoPaths에 있는 모든 영상을 가로 스크롤 리스트로 표시
+            videoPaths.isNotEmpty
+                ? SizedBox(
+              height: 160, // 비디오 컨테이너 높이 지정
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: videoPaths.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20), // 둥근 모서리 적용
+                      child: SizedBox(
+                        height: 160,
+                        child: AspectRatio(
+                          aspectRatio: 18 / 12, // 고정 aspect ratio 18:12 적용
+                          child: VideoItemWidget(videoUrl: videoPaths[index]),
+                        ),
+                      ),
                     ),
-                  )
-                ),
-              )
-                  : const Center(child: CircularProgressIndicator()), // 초기화 전에는 로딩 인디케이터 표시
-            ),
+                  );
+                },
+              ),
+            )
+                : const Center(child: CircularProgressIndicator()),
 
             const SizedBox(height: 3),
+            // ESG 점수 및 신고 건수 영역
             Row(
               children: [
                 Column(
@@ -294,6 +282,54 @@ class _Home01State extends State<Home01> {
       bottomNavigationBar: const Padding(
         padding: EdgeInsets.only(bottom: 20.0),
         child: BottomNavi(),
+      ),
+    );
+  }
+}
+
+class VideoItemWidget extends StatefulWidget {
+  final String videoUrl;
+  const VideoItemWidget({Key? key, required this.videoUrl}) : super(key: key);
+
+  @override
+  _VideoItemWidgetState createState() => _VideoItemWidgetState();
+}
+
+class _VideoItemWidgetState extends State<VideoItemWidget> {
+  VideoPlayerController? _itemController;
+
+  @override
+  void initState() {
+    super.initState();
+    _itemController = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((_) {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _itemController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20), // 둥근 모서리 적용
+        child: SizedBox(
+          height: 160,
+          child: AspectRatio(
+            aspectRatio: _itemController?.value.isInitialized == true
+                ? _itemController!.value.aspectRatio
+                : 16 / 9, // 기본 aspect ratio 설정
+            child: _itemController?.value.isInitialized == true
+                ? VideoPlayer(_itemController!)
+                : const Center(child: CircularProgressIndicator()),
+          ),
+        ),
       ),
     );
   }

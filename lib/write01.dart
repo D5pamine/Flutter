@@ -401,7 +401,7 @@ class _Write01State extends State<Write01> {
                   backColor: const Color(0xffF0F3FA), onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Detail01()),
+                    MaterialPageRoute(builder: (context) => Detail01(detectedId: 3,)),
                   );
                 },
                 ),

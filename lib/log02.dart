@@ -86,7 +86,7 @@ class _Log02State extends State<Log02> {
             ),
             const SizedBox(height: 10),
             SizedBox(
-              height: 450,
+              height: 420,
               width: 315,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -124,12 +124,13 @@ class _Log02State extends State<Log02> {
                 ),
               ),
             ),
+            const SizedBox(height: 10,),
             CustomButton(
               buttonText: '상세보기',
               fontWeight: FontWeight.w600, onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Detail01()),
+                MaterialPageRoute(builder: (context) => Detail01(detectedId: 3,)),
               );
             },
             ),
