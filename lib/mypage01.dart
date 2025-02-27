@@ -31,39 +31,36 @@ class _MyPage01State extends State<MyPage01> {
   void initState() {
     super.initState();
     fetchUserInfo(); // 사용자 정보 가져오기
-    loadVideos([
-      "assets/videos/test1.mp4",
-      "assets/videos/test2.mp4",
-      "assets/videos/test3.mp4"
-    ]);
   }
 
   Future<void> fetchUserInfo() async {
-    var userService = UserDataGet();
-    var response = await userService.getUserInfo();
+    print("🚀 fetchUserInfo() 실행 시작");
 
-    if (response["statusCode"] == 200) {
+    var userService = UserDataGet();
+    var response;
+
+    try {
+      response = await userService.getUserInfo();
+      print("🔍 API 응답 받음: $response");
+    } catch (e, stacktrace) {
+      print("❌ fetchUserInfo()에서 예외 발생: $e");
+      print("🛑 Stacktrace: $stacktrace");
+      return;
+    }
+
+    if (response != null && response["statusCode"] == 200) {
+      print("✅ 사용자 정보 정상 수신");
       setState(() {
         username = response["data"]["username"];
         email = response["data"]["email"];
         phone = response["data"]["phone"];
-        egsScore = response["data"]["egs_score"].toDouble();
+      //   egsScore = response["data"]["egs_score"];
       });
-    } else {
-      print("❌ Error fetching user info: ${response["error"]}");
-    }
-  }
 
-  Future<void> loadVideos(List<String> paths) async {
-    for (var path in paths) {
-      try {
-        var controller = VideoPlayerController.asset(path);
-        await controller.initialize();
-        controllers.add(controller);
-        setState(() {});
-      } catch (error) {
-        print("❌ Error loading video $path: $error");
-      }
+      print("🔍 fetchVideos() 실행 전, userId 값: $email");
+      print("✅ fetchVideos() 실행됨");
+    } else {
+      print("❌ Error fetching user info: ${response?["error"] ?? "응답 없음"}");
     }
   }
 

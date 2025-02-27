@@ -272,7 +272,7 @@ class _Home01State extends State<Home01> {
                       children: [
                         Image.asset('assets/images/free-icon-leaf.png', height: 18),
                         const SizedBox(width: 5),
-                        const Text("1544.00",
+                        const Text("0.0",
                             style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18,

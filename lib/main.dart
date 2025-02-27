@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flyaid5pamine/detail02.dart';
 import 'package:flyaid5pamine/report02.dart';
 import 'package:flyaid5pamine/result01.dart';
+import 'package:flyaid5pamine/search01.dart';
 import 'package:flyaid5pamine/service/userservice.dart';
 import 'package:flyaid5pamine/test01.dart';
 import 'package:flyaid5pamine/widgets/CustomButton.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      home: Login01(),
+      home: Search01(),
     );
   }
 }

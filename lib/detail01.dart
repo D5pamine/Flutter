@@ -312,7 +312,7 @@ class _Detail01State extends State<Detail01> {
                   fontWeight: FontWeight.w600,
                   backColor: const Color(0xffF0F3FA),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Write01()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Write01(detectedId: widget.detectedId,)));
                   },
                 ),
                 const SizedBox(width: 10,),
