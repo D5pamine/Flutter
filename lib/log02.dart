@@ -5,6 +5,7 @@ import 'package:flyaid5pamine/widgets/BottomNavi.dart';
 import 'package:flyaid5pamine/widgets/CustomButton.dart';
 import 'package:flyaid5pamine/widgets/CustomAppBar.dart';
 import 'package:flyaid5pamine/widgets/MovieCard.dart';
+import 'package:flyaid5pamine/write01.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {

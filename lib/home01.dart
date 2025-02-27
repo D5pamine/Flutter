@@ -32,10 +32,12 @@ class _Home01State extends State<Home01> {
   double egsScore = 0.0;
   List<String> videoPaths = [];
 
+
   @override
   void initState() {
     super.initState();
     fetchUserInfo(); // 사용자 정보 가져오기
+    showSnackbar();
   }
 
   // 유저 정보 가져오기
@@ -135,6 +137,23 @@ class _Home01State extends State<Home01> {
     super.dispose();
   }
 
+  void showSnackbar() {
+    Future.delayed(const Duration(seconds: 3), () { // ⏳ 3초 후 실행
+      if (mounted) { // 🔹 화면이 살아있을 때만 실행
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("🚀 전방에 스텔스 차량이 감지되었습니다."),
+            duration: const Duration(seconds: 3), // 🕒 3초 동안 표시
+            behavior: SnackBarBehavior.floating, // 🆙 화면 위에 떠 있도록 설정
+            margin: const EdgeInsets.all(20), // 🏞️ 마진 조정
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), // 🟢 모서리 둥글게
+          ),
+        );
+      }
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -225,11 +244,15 @@ class _Home01State extends State<Home01> {
                       scrollDirection: Axis.horizontal, // 가로 스크롤 가능
                       itemCount: videoPaths.length, // 리스트에 있는 모든 영상
                       itemBuilder: (context, index) {
-                        return VideoItemWidget(videoUrl: videoPaths[index]);
+                        return SizedBox(
+                          width: 240, // ✅ 가로 길이를 조정
+                          child: VideoItemWidget(videoUrl: videoPaths[index]),
+                        );
                       },
                     ),
-                  )
+                  ),
                 ),
+
               )
                   : const Center(child: CircularProgressIndicator()), // 초기화 전에는 로딩 인디케이터 표시
             ),

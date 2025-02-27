@@ -208,19 +208,19 @@ class _Write01State extends State<Write01> {
                           },
                           child: _isEditingTime // _isEditing 이어야 하나
                               ? SizedBox(
-                                width: 80,
-                                height: 50,
-                                  child: TextField(
-                                    controller: _timecontroller,
-                                    autofocus: true,
-                                    decoration: const InputDecoration(border: OutlineInputBorder(),),
-                                    onSubmitted: (value) {
-                                      setState(() {
-                                        _timeText = value;
-                                        _isEditingTime = false;
-                                      });
-                                    },
-                                  ),
+                            width: 80,
+                            height: 50,
+                            child: TextField(
+                              controller: _timecontroller,
+                              autofocus: true,
+                              decoration: const InputDecoration(border: OutlineInputBorder(),),
+                              onSubmitted: (value) {
+                                setState(() {
+                                  _timeText = value;
+                                  _isEditingTime = false;
+                                });
+                              },
+                            ),
                           ):
                           CustomIconText(
                             boxWidth: 80,
@@ -399,10 +399,10 @@ class _Write01State extends State<Write01> {
                   textWidth: 315,
                   fontWeight: FontWeight.w600,
                   backColor: const Color(0xffF0F3FA), onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Detail01(detectedId: 3,)),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => Detail01(detectedId: widget.,)),
+                  // );
                 },
                 ),
               ),
@@ -410,11 +410,10 @@ class _Write01State extends State<Write01> {
           ),
         ),
       ),
-            bottomNavigationBar: const Padding(
-              padding: EdgeInsets.only(bottom: 20.0),
-              child: BottomNavi(),
+      bottomNavigationBar: const Padding(
+        padding: EdgeInsets.only(bottom: 20.0),
+        child: BottomNavi(),
       ),
     );
   }
 }
-

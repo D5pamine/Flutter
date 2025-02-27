@@ -3,6 +3,7 @@ import 'package:flyaid5pamine/detail02.dart';
 import 'package:flyaid5pamine/report02.dart';
 import 'package:flyaid5pamine/result01.dart';
 import 'package:flyaid5pamine/service/userservice.dart';
+import 'package:flyaid5pamine/test01.dart';
 import 'package:flyaid5pamine/widgets/CustomButton.dart';
 import 'package:flyaid5pamine/widgets/CustomAppBar.dart';
 import 'package:flyaid5pamine/widgets/InputCustomTextField.dart';
@@ -123,7 +124,7 @@ class _Login01State extends State<Login01> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => Login03()),
+                                          builder: (context) => Home01()),
                                     );
                                   },
                                   child: const Text("확인"),
