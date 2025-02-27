@@ -198,7 +198,7 @@ class _Log01State extends State<Log01> {
                           setState(() {
                             selectedMovieCardIndex = i;
                             print("✅ 사용자가 선택한 영상 번호: ${detectedIdList[i]}");
-                            choseVideo = detectedIdList[i];
+                            choseVideo = detectedIdList[selectedMovieCardIndex];
                           });
                         },
                       child: Builder(

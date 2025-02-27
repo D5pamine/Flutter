@@ -57,7 +57,7 @@ class _Home01State extends State<Home01> {
     if (response != null && response["statusCode"] == 200) {
       print("✅ 사용자 정보 정상 수신");
       setState(() {
-        username = response["data"]["username"];
+        username = response["data"]["username"].substring(1);
         userId = response["data"]["user_id"];
         // egsScore = response["data"]["egs_score"];
       });
@@ -147,10 +147,10 @@ class _Home01State extends State<Home01> {
           children: [
             Row(
               children: [
-                const Column(
+                Column(
                   children: [
-                    Text('Hi, David👋',
-                        style: TextStyle(
+                    Text("반가워요, $username님",
+                        style: const TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF2F2F2F))),

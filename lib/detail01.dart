@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flyaid5pamine/report01.dart';
+import 'package:flyaid5pamine/service/userdataget.dart';
+import 'package:flyaid5pamine/service/videoget.dart';
 import 'package:flyaid5pamine/widgets/BottomNavi.dart';
 import 'package:flyaid5pamine/widgets/CustomButton.dart';
 import 'package:flyaid5pamine/widgets/CustomIconText.dart';
 import 'package:flyaid5pamine/write01.dart';
 import 'package:video_player/video_player.dart';
 
+import 'home01_test.dart';
+import 'log01.dart';
 import 'main.dart';
 
 void main() {
@@ -22,44 +26,179 @@ class Detail01 extends StatefulWidget {
 }
 
 class _Detail01State extends State<Detail01> {
-  List<VideoPlayerController> controllers = [];
+  List<VideoPlayerController> _controllers = [];
+  List<Map<String, dynamic>> videoList = []; // FastAPI에서 가져온 영상 데이터 리스트
+  List<int> detectedIdList = [];
   final now = DateTime.now();
+  var car_num = "Loading...";
+  String location = "Loading...";
+  String violation = "Loading...";
+  String time = "Loading...";
+  String username = "Loading...";
+  String userId = "Loading...";
+  List<String> videoPaths = [];
+  int selectedMovieCardIndex = -1;
+  int choseVideo = 0;
+  String finalurl = "";
 
   @override
   void initState() {
     super.initState();
-    List<String> videoPaths = [
-      "assets/videos/test1.mp4",
-      "assets/videos/test2.mp4",
-      "assets/videos/test3.mp4"
-    ];
-    print("Loading video paths: $videoPaths");
-    loadVideos(videoPaths);
+    fetchUserInfo();
+    fetchAndLoadVideos();
   }
 
-  Future<void> loadVideos(List<String> paths) async {
-    for (var path in paths) {
-      try {
-        var controller = VideoPlayerController.asset(path);
-        await controller.initialize();  // ✅ 비디오가 완전히 초기화된 후 다음으로 진행
-        controllers.add(controller);
-        setState(() {});
-        print("✅ Loaded video: $path");  // ✅ 정상적으로 로드된 비디오 출력
-      } catch (error) {
-        print("❌ Error loading video $path: $error");  // ✅ 오류 발생 시 출력
-      }
+  // 유저 정보 가져오기
+  Future<void> fetchUserInfo() async {
+    print("🚀 fetchUserInfo() 실행 시작");
+
+    var userService = UserDataGet();
+    var response;
+
+    try {
+      response = await userService.getUserInfo();
+      print("🔍 API 응답 받음: $response");
+    } catch (e, stacktrace) {
+      print("❌ fetchUserInfo()에서 예외 발생: $e");
+      print("🛑 Stacktrace: $stacktrace");
+      return;
+    }
+
+    if (response != null && response["statusCode"] == 200) {
+      print("✅ 사용자 정보 정상 수신");
+      setState(() {
+        username = response["data"]["username"];
+        userId = response["data"]["user_id"];
+      });
+
+      print("🔍 fetchVideos() 실행 전, userId 값: $userId");
+      fetchVideos();
+      print("✅ fetchVideos() 실행됨");
+    } else {
+      print("❌ Error fetching user info: ${response?["error"] ?? "응답 없음"}");
     }
   }
 
+  Future<void> fetchVideos() async {
+    if (userId == "Loading..." || userId.isEmpty) {
+      print("⏳ userId를 가져오는 중... 영상 요청을 보류합니다.");
+      return;
+    } else {
+      print("영상 요청을 실행합니다 멘탈 잡으세요");
+    }
+
+    var videoService = Videoget();
+    var response = await videoService.getUserVideo(userId);
+
+    print("fetchVideos 함수는 됨");
+
+    if (response["statusCode"] == 200) {
+      print("📹 영상 리스트: ${response["data"]}");
+      setState(() {
+        videoList = List<Map<String, dynamic>>.from(response["data"]);
+        detectedIdList = videoList
+            .map((video) => video["detected_id"] as int)
+            .toList();
+        print("✅ 영상 번호 가져오기: $detectedIdList");
+        print("✅ fetchVideos 데이터 가져오기: $videoList");
+        // widget.detectedId와 일치하는 영상 데이터 찾기
+        var matchedVideo = videoList.firstWhere(
+              (video) => video['detected_id'] == widget.detectedId,
+          orElse: () => {},
+        );
+        if (matchedVideo.isNotEmpty) {
+          // 예시: car_num 값을 출력
+          print("일치하는 영상의 car_num: ${matchedVideo['car_num']}");
+          print("일치하는 영상의 location: ${matchedVideo['location']}");
+          print("일치하는 영상의 violation: ${matchedVideo['violation']}");
+          print("일치하는 영상의 time: ${matchedVideo['time']}");
+          print("일치하는 영상의 time: ${matchedVideo['time']}");
+
+          car_num = matchedVideo['car_num'];
+          location = matchedVideo['location'];
+          violation = matchedVideo['violation'];
+          time = matchedVideo['time'];
+        }
+      });
+      await fetchAndLoadVideos();
+      if (videoPaths.isNotEmpty) {
+        await initializeVideoControllers();
+      }
+    } else {
+      print(response["error"]);
+    }
+  }
+
+  Future<void> fetchAndLoadVideos() async {
+    for (var detectedId in detectedIdList) {
+      String? videoUrl = await VideoStream().streamUserVideo(detectedId);
+      print("🔍 요청한 detectedId: $detectedId");
+      print("📥 가져온 비디오 URL: ${videoUrl ?? '❌ URL 없음'}");
+      if (videoUrl == null || videoUrl.isEmpty) {
+        print("❌ 유효하지 않은 비디오 URL입니다. detectedId: $detectedId");
+      } else {
+        if (detectedId == widget.detectedId) { // 여기서 detectedId를 직접 비교합니다.
+          videoPaths.add(videoUrl);
+          print("🔍 현재 비디오 경로 현황: $videoPaths");
+          print(videoUrl);
+          finalurl = videoUrl;
+          print("🔍 최종 경로: $finalurl");
+        }
+      }
+    }
+    print("🔍 최종 비디오 경로 현황: $videoPaths");
+  }
+
+
+  Future<void> initializeVideoControllers() async {
+    // 기존 컨트롤러 dispose
+    for (var ctrl in _controllers) {
+      await ctrl.dispose();
+    }
+    _controllers.clear();
+
+    // 비디오 컨트롤러 초기화 (비동기 처리)
+    for (var url in videoPaths) {
+      VideoPlayerController controller = VideoPlayerController.network(url);
+
+      // 🔥 컨트롤러 상태가 변경될 때 자동으로 UI 업데이트
+      controller.addListener(() {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+
+      await controller.initialize(); // ✅ 비디오 초기화
+      _controllers.add(controller);
+    }
+
+    if (_controllers.isNotEmpty) {
+      _controllers[0].play(); // ✅ 첫 번째 비디오 자동 재생
+    }
+
+    setState(() {}); // ✅ UI 업데이트
+  }
+
+
   @override
   void dispose() {
-    for (var controller in controllers) {
-      controller.dispose();  // ✅ 각 컨트롤러에 대해 개별적으로 dispose() 실행
+    // 모든 컨트롤러 dispose
+    for (var ctrl in _controllers) {
+      ctrl.dispose();
     }
     super.dispose();
   }
 
+
   Widget build(BuildContext context) {
+    if (_controllers.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('상세보기 - ID: ${widget.detectedId}'),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       body: Padding(padding: const EdgeInsets.only(left: 20.0, top: 40.0, right: 20.0, bottom: 20.0),
         child: Column(
@@ -71,19 +210,25 @@ class _Detail01State extends State<Detail01> {
               Stack(
                 children: [
                   SizedBox(
-                    height: 300,  // ✅ 비디오 개별 높이 지정
+                    height: 300,  // 비디오 영역 높이 지정
                     child: AspectRatio(
-                      aspectRatio:  18 / 12,
-                      child: VideoPlayer(controllers[0]),  // ✅ 각 비디오 컨트롤러 사용),
+                      aspectRatio: 18 / 12,
+                      child: videoPaths.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : VideoItemWidget(videoUrl: videoPaths[0]),
+                      ),
                     ),
-                  ),
                   Positioned(
                     top: 10,  // 🔹 위쪽 여백 조절
                     left: 10,  // 🔹 왼쪽 여백 조절
                     child: CircleAvatar(
                       backgroundColor: Colors.black54,  // 🔹 반투명 검정 배경
                       radius: 20,
-                      child: IconButton(icon: const Icon(Icons.arrow_back), color: Colors.white, onPressed: () {},),
+                      child: IconButton(icon: const Icon(Icons.arrow_back),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },),
                     ),
                   ),
                   Positioned(
@@ -118,14 +263,14 @@ class _Detail01State extends State<Detail01> {
                             ),
                             IconButton(
                               icon: Icon(
-                                controllers[0].value.isPlaying ? Icons.pause : Icons.play_arrow,
+                                _controllers[0].value.isPlaying ? Icons.pause : Icons.play_arrow,
                                 color: Colors.white,
                               ),
                               onPressed: () {
                                 setState(() {
-                                  controllers[0].value.isPlaying
-                                      ? controllers[0].pause()
-                                      : controllers[0].play();
+                                  _controllers[0].value.isPlaying
+                                      ? _controllers[0].pause()
+                                      : _controllers[0].play();
                                 });
                               },
                             ),
@@ -145,17 +290,20 @@ class _Detail01State extends State<Detail01> {
               ),
             ),
             const SizedBox(height: 15,),
-            const Row(
+            Row(
               children: [
-                Text('2025.02.13', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),),
-                Spacer(),
-                Icon(Icons.location_on, color: Color(0xFF848282),),
-                SizedBox(width: 3,),
-                Text('마포대교', style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16,color: Color(0xFF848282)),),
+                Text(time.toString().split('T')[0], style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),),
+                const Spacer(),
+                const Icon(Icons.location_on, color: Color(0xFF848282),),
+                const SizedBox(width: 3,),
+                Text(location.split(' ')[0], style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 16,color: Color(0xFF848282)),),
+                const Text(" "),
+                Text(location.split(' ')[1], style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 16,color: Color(0xFF848282)),),
+
               ],
             ),
             const SizedBox(height: 12,),
-            const SizedBox(
+            SizedBox(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -165,37 +313,37 @@ class _Detail01State extends State<Detail01> {
                         boxWidth: 35,
                         boxHeight: 35,
                         boxColor: const Color(0xFFEDEDED),
-                        customText: '15:26',
+                        customText: time.toString().split('T')[1],
                         customIcon:const Icon(Icons.watch_later),
                       ),
                       const SizedBox(width: 20,),
-                      const CustomIconText(
+                      CustomIconText(
                           boxWidth: 35,
                           boxHeight: 35,
-                          boxColor: Color(0xFFEDEDED),
-                          customText: '서울 12가 3456',
-                          customIcon:Icon(Icons.car_crash)
+                          boxColor: const Color(0xFFEDEDED),
+                          customText: car_num,
+                          customIcon:const Icon(Icons.car_crash)
                       ),
                     ],
                   ),
                   const SizedBox(height: 10,),
-                  const CustomIconText(
+                  CustomIconText(
                       boxWidth: 35,
                       boxHeight: 35,
-                      boxColor: Color(0xFFEDEDED),
-                      customText: '칼치기, 신호 위반, 과속',
-                      customIcon:Icon(Icons.star)
+                      boxColor: const Color(0xFFEDEDED),
+                      customText: violation,
+                      customIcon:const Icon(Icons.star)
                   ),
                   const SizedBox(height: 10,),
-                  const Text('2월 13일 마포대교 칼치기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
+                  Text('$location $violation 차량', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
                   const SizedBox(height: 5,),
-                  const SizedBox(
+                  SizedBox(
                     height: 100,
                     width: 315,
                     child: SingleChildScrollView( // 🔹 스크롤 가능하게 설정
                       child: Text(
-                        '영상에서는 [서울 12가 3456] 차량이 신호를 무시하고 적색 신호에 교차로를 통과하는 장면이 기록되어 있습니다. 이는 교차로 내 사고 위험을 초래한 명백한 신호 위반 사례입니다.',
-                        style: TextStyle(color: Color(0xFF848282)),
+                        '영상에서는 $car_num 차량이 신호를 무시하고 적색 신호에 교차로를 통과하는 장면이 기록되어 있습니다. 이는 교차로 내 사고 위험을 초래한 명백한 신호 위반 사례입니다.',
+                        style: const TextStyle(color: Color(0xFF848282)),
                       ),
                     ),
                   ),

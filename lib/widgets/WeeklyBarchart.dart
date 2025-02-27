@@ -17,7 +17,7 @@ class WeeklyBarChart extends StatelessWidget {
               sideTitles: SideTitles(showTitles: false, reservedSize: 40),
             ),
               leftTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: true, interval: 1000, reservedSize: 40), // ✅ 500 단위
+                sideTitles: SideTitles(showTitles: true, interval: 2000, reservedSize: 40), // ✅ 500 단위
               ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
