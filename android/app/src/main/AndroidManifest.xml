@@ -1,13 +1,14 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">ㅛㅐㅐㅝㅑ
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
+
         android:label="flyaid5pamine"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCUx4ZVbZHF6R_vMprDAZbsmt0L1OvhOD4"/>
+            android:value="googleApiKey"/>
 
         <activity
             android:name=".MainActivity"

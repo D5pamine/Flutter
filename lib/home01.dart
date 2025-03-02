@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flyaid5pamine/esg01.dart';
 import 'package:flyaid5pamine/log01.dart';
@@ -31,13 +32,25 @@ class _Home01State extends State<Home01> {
   String userId = "Loading...";
   double egsScore = 0.0;
   List<String> videoPaths = [];
-
+  Timer? _timer; // 주기적 갱신을 위한 타이머
 
   @override
   void initState() {
     super.initState();
     fetchUserInfo(); // 사용자 정보 가져오기
+    // 초기 로딩 시 기본 알림(예시)
     showSnackbar();
+    // 일정 주기마다 영상 목록을 갱신 (예: 60초마다)
+    _timer = Timer.periodic(Duration(seconds: 60), (timer) {
+      fetchVideos();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller?.dispose();
+    super.dispose();
   }
 
   // 유저 정보 가져오기
@@ -72,6 +85,38 @@ class _Home01State extends State<Home01> {
     }
   }
 
+  // 새 영상 업로드 시 알림용 스낵바 함수
+  void showNewVideoAlert() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("새 영상이 업로드 되었습니다."),
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
+  }
+
+  // 초기 로딩 시 기본 알림 (예시)
+  void showSnackbar() {
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("🚀 전방에 스텔스 차량이 감지되었습니다."),
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    });
+  }
+
   Future<void> fetchVideos() async {
     if (userId == "Loading..." || userId.isEmpty) {
       print("⏳ userId를 가져오는 중... 영상 요청을 보류합니다.");
@@ -87,14 +132,26 @@ class _Home01State extends State<Home01> {
 
     if (response["statusCode"] == 200) {
       print("📹 영상 리스트: ${response["data"]}");
+
+      // 새로 받아온 영상 목록
+      List<Map<String, dynamic>> newVideoList =
+      List<Map<String, dynamic>>.from(response["data"]);
+
+      // 기존 목록이 있을 때 새 영상이 추가되었다면 알림 표시
+      if (videoList.isNotEmpty && newVideoList.length > videoList.length) {
+        showNewVideoAlert();
+      }
+
       setState(() {
-        videoList = List<Map<String, dynamic>>.from(response["data"]); // 리스트 저장
+        videoList = newVideoList; // 리스트 저장
         detectedIdList = videoList
             .map((video) => video["detected_id"] as int)
             .toList();
         print("✅ 영상 번호 가져오기: $detectedIdList");
       });
+
       await fetchAndLoadVideos();
+
       if (videoPaths.isNotEmpty) {
         initializeVideoPlayer();
       }
@@ -104,21 +161,23 @@ class _Home01State extends State<Home01> {
   }
 
   Future<void> fetchAndLoadVideos() async {
-    for (var detectedId in detectedIdList) { // 리스트 순회
-      String? videoUrl = await VideoStream().streamUserVideo(detectedId); // 개별 ID로 API 요청
+    videoPaths.clear();
+    for (var detectedId in detectedIdList) {
+      String? videoUrl = await VideoStream().streamUserVideo(detectedId);
 
       print("🔍 요청한 detectedId: $detectedId");
       print("📥 가져온 비디오 URL: ${videoUrl ?? '❌ URL 없음'}");
 
-      if (videoUrl == null || videoUrl.isEmpty) { // URL이 없을 경우 오류 출력
+      if (videoUrl == null || videoUrl.isEmpty) {
         print("❌ 유효하지 않은 비디오 URL입니다. detectedId: $detectedId");
       } else {
         videoPaths.add(videoUrl);
         print("🔍 현재 비디오 경로 현황: $videoPaths");
       }
     }
+    // 예시: 추가 URL (테스트 용도)
     videoPaths.add('http://192.168.35.8:8000/video-stream/11');
-    print("🔍 현재 비디오 경로 현황: $videoPaths");
+    print("🔍 최종 비디오 경로 현황: $videoPaths");
   }
 
   void initializeVideoPlayer() {
@@ -132,35 +191,12 @@ class _Home01State extends State<Home01> {
   }
 
   @override
-  void dispose() {
-    _controller?.dispose();  // _controller가 null이 아닐 때만 dispose
-    super.dispose();
-  }
-
-  void showSnackbar() {
-    Future.delayed(const Duration(seconds: 3), () { // ⏳ 3초 후 실행
-      if (mounted) { // 🔹 화면이 살아있을 때만 실행
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("🚀 전방에 스텔스 차량이 감지되었습니다."),
-            duration: const Duration(seconds: 3), // 🕒 3초 동안 표시
-            behavior: SnackBarBehavior.floating, // 🆙 화면 위에 떠 있도록 설정
-            margin: const EdgeInsets.all(20), // 🏞️ 마진 조정
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), // 🟢 모서리 둥글게
-          ),
-        );
-      }
-    });
-  }
-
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Padding(
-        padding:
-        const EdgeInsets.only(left: 20.0, top: 0.0, right: 20.0, bottom: 20.0),
+        padding: const EdgeInsets.only(
+            left: 20.0, top: 0.0, right: 20.0, bottom: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -237,26 +273,24 @@ class _Home01State extends State<Home01> {
                   ? Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20), // 둥근 모서리 적용
+                  borderRadius: BorderRadius.circular(20),
                   child: SizedBox(
-                    height: 160, // 비디오 컨테이너 높이 지정
+                    height: 160,
                     child: ListView.builder(
-                      scrollDirection: Axis.horizontal, // 가로 스크롤 가능
-                      itemCount: videoPaths.length, // 리스트에 있는 모든 영상
+                      scrollDirection: Axis.horizontal,
+                      itemCount: videoPaths.length,
                       itemBuilder: (context, index) {
                         return SizedBox(
-                          width: 240, // ✅ 가로 길이를 조정
+                          width: 240,
                           child: VideoItemWidget(videoUrl: videoPaths[index]),
                         );
                       },
                     ),
                   ),
                 ),
-
               )
-                  : const Center(child: CircularProgressIndicator()), // 초기화 전에는 로딩 인디케이터 표시
+                  : const Center(child: CircularProgressIndicator()),
             ),
-
             const SizedBox(height: 3),
             Row(
               children: [
@@ -270,7 +304,8 @@ class _Home01State extends State<Home01> {
                             color: Color(0xFF2F2F2F))),
                     Row(
                       children: [
-                        Image.asset('assets/images/free-icon-leaf.png', height: 18),
+                        Image.asset('assets/images/free-icon-leaf.png',
+                            height: 18),
                         const SizedBox(width: 5),
                         const Text("0.0",
                             style: TextStyle(

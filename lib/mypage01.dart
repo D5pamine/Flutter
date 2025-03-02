@@ -81,30 +81,19 @@ class _MyPage01State extends State<MyPage01> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              const SizedBox(height: 10), // ✅ 간격 조정 (Row 밖에서 적용)
+              const Row(
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Home01()),
-                      );
-                    },
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB267)),
+                  Spacer(), // ✅ 왼쪽 공간을 최대화하여 중앙 정렬 효과
+                  Text(
+                    "Profile",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFFFFB267)),
                   ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        "Profile",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFFFFB267)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
-              CustomCard(
+                  Spacer(), // ✅ 오른쪽 공간을 동일하게 배분하여 중앙 정렬 유지
+            ],
+          ),
+          const SizedBox(height: 10,),
+          CustomCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,7 +108,7 @@ class _MyPage01State extends State<MyPage01> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Column(
+                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(username, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
@@ -133,7 +122,7 @@ class _MyPage01State extends State<MyPage01> {
                           ],
                         ),
                         const Spacer(),
-                        CustomButton(
+                         CustomButton(
                           buttonText: '수정',
                           textWidth: 70.0,
                           textHeight: 30.0,

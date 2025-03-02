@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flyaid5pamine/service/videoget.dart';
 import 'package:flyaid5pamine/widgets/BottomNavi.dart';
 import 'package:flyaid5pamine/widgets/CustomButton.dart';
 import 'package:flyaid5pamine/widgets/CustomAppBar.dart';
 import 'package:flyaid5pamine/widgets/MovieCard.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:video_player/video_player.dart';
 
 import 'main.dart';
 
@@ -14,11 +16,42 @@ void main() {
 class Search01 extends StatefulWidget {
   @override
   _Search01State createState() => _Search01State();
+
 }
+
+
+void fetchStealthVideos() async {
+  var videoService = VideoGetByViolation();
+  var response = await videoService.getVideosByViolation("stealth");
+
+  if (response["statusCode"] == 200) {
+    print("📹 Stealth violation videos: ${response["data"]}");
+  } else {
+    print("🚨 오류 발생: ${response["error"]}");
+  }
+}
+
 
 class _Search01State extends State<Search01> {
   final now = DateTime.now();
   DateTime _selectedDay = DateTime.now();
+  String selectedButton = "";
+  List<dynamic> videos = [];
+  List<int> detectedIdList = [];
+  List<VideoPlayerController> _controllers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStealthVideos();
+  }
+
+  void toggleButton(String buttonText) {
+    setState(() {
+      selectedButton = buttonText; // 선택한 버튼 업데이트
+    });
+    VideoGetByViolation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +161,13 @@ class _Search01State extends State<Search01> {
                                 textWidth: 95.0,
                                 textHeight: 40.0,
                                 textSize: 11.0,
-                                fontWeight: FontWeight.w600, onPressed: () {  },
-                                // backColor: const Color(0xffF0F3FA),
+                                fontWeight: FontWeight.w600,
+                                backColor: selectedButton == '칼치기' ? Colors.orange : const Color(0xffF0F3FA), // 색상 변경
+                                onPressed: () async {
+                                  toggleButton('칼치기');
+                                  final result = await VideoGetByViolation().getVideosByViolation('weaving');
+                                  print(result);
+                                },
                               ),
                               const SizedBox(width: 10,),
                               CustomButton(
@@ -138,7 +176,14 @@ class _Search01State extends State<Search01> {
                                 textHeight: 40.0,
                                 textSize: 11.0,
                                 fontWeight: FontWeight.w600,
-                                backColor: const Color(0xffF0F3FA), onPressed: () {  },
+                                backColor: selectedButton == '헬멧 미착용' ? Colors.orange : const Color(0xffF0F3FA), // 색상 변경
+                                onPressed: () async {
+                                  toggleButton('헬멧 미착용');
+                                  final result = await VideoGetByViolation().getVideosByViolation('no helmet');
+                                  print(result);
+                                  detectedIdList = result['detected_id'];
+                                  print(detectedIdList);
+                                },
                               ),
                               const SizedBox(width: 10,),
                               CustomButton(
@@ -147,7 +192,12 @@ class _Search01State extends State<Search01> {
                                 textHeight: 40.0,
                                 textSize: 11.0,
                                 fontWeight: FontWeight.w600,
-                                backColor: const Color(0xffF0F3FA), onPressed: () {  },
+                                backColor: selectedButton == '스텔스' ? Colors.orange : const Color(0xffF0F3FA), // 색상 변경
+                                onPressed: () async {
+                                  toggleButton('스텔스');
+                                  final result = await VideoGetByViolation().getVideosByViolation('stealth');
+                                  print(result[0]['detected_id']);
+                                },
                               ),
                               const SizedBox(width: 10,),
                               CustomButton(
@@ -156,14 +206,18 @@ class _Search01State extends State<Search01> {
                                 textHeight: 40.0,
                                 textSize: 11.0,
                                 fontWeight: FontWeight.w600,
-                                backColor: const Color(0xffF0F3FA), onPressed: () {  },
+                                backColor: selectedButton == '과적' ? Colors.orange : const Color(0xffF0F3FA), // 색상 변경
+                                onPressed: () async {
+                                  toggleButton('과적');
+                                  final result = await VideoGetByViolation().getVideosByViolation('overloading');
+                                  print(result);
+                                },
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10,),
                         // Moviecard(
-                        //   controllers: controllers[0],
+                        //   controllers: _controllers[0],
                         //   reportcontent: '신호 위반 (적색 신호에 교차로 통과)',
                         //   reportlocation: '서울특별시 강남구 도산대로 123',
                         //   reportreason: '도로교통법 제 5조 (신호준수 의무위반)',
@@ -171,6 +225,7 @@ class _Search01State extends State<Search01> {
                         //   reportdate: '2025.02.13',
                         //   cardLineColor: const Color(0xffFFB267),
                         // ),
+                        const SizedBox(height: 10,),
                       ],
                     ),
                   ),

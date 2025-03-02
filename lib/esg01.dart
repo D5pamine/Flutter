@@ -90,14 +90,11 @@ class Esg01 extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         // crossAxisAlignment: CrossAxisAlignment.start, // 상단 여백 줄이기
                         children: [
-                          const Text("나의 환경 기여 효과", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
-                          const Spacer(),
-                          CustomButton(buttonText: '전체보기', textWidth: 70.0, textHeight: 30.0, textSize: 10.0,
-                          backColor: Color(0xffF0F3FA), textColor: Color(0xff1F87FE), onPressed: () {  },
-                          ),
+                          Text("나의 환경 기여 효과", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),),
+                          Spacer(),
                         ],
                       ),
                       const SizedBox(height: 5,),
